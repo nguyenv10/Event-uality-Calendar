@@ -14,3 +14,21 @@
 .eventsAPI {
     border: 1px solid #888; height: 200px;
 }
+
+/* for the carousel */
+.card .card-content {
+    padding: 5px;
+}
+/* for the carousel */
+.card .card-image .card-title {
+    padding: 5px;
+}
+/* for the carousel */
+.btn, .btn-large, .btn-small, .btn-flat {
+    padding: 0px 3px 0px 3px;
+    margin: 0px 2px 0px 2px;
+}
+/* for the carousel */
+i.right {
+    margin-left: 0px;
+}
