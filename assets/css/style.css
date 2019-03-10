@@ -12,7 +12,7 @@
 }
 
 .eventsAPI {
-    border: 1px solid #888; height: 200px;
+    border: 1px solid #888; 
 }
 
 /* for the carousel */
@@ -22,13 +22,25 @@
 /* for the carousel */
 .card .card-image .card-title {
     padding: 5px;
+
+    width: 100%;
+    color: #ffffff;
+    /* background-color: #888; */
+    background-color:rgba(52, 52, 52, 0.4);
+    /* opacity: 0.3; */
+    
 }
 /* for the carousel */
-.btn, .btn-large, .btn-small, .btn-flat {
+.card-button {
     padding: 0px 3px 0px 3px;
     margin: 0px 2px 0px 2px;
 }
 /* for the carousel */
-i.right {
+#iCard {
     margin-left: 0px;
+}
+
+/* for the events search form */
+label {
+    font-size: 18px;
 }

@@ -87,8 +87,7 @@ $(document).ready(function() {
 /********************* EVENTS API CODE *****************************/
       // this javascript will read city, startdate, enddate from the user input
       // it will make a call to the Ticketmaster API and display a group of events
-      // each event will have a event name, event date, event time, event venue, link to ticket information,
-      // and an event image
+      // each event will have a event name, event date, event time, event venue, link to ticket information, and an event image
 
       var apiKey = "Rr353U4OsbhsMLwSJCn4VqwWk1kAimY4";
       // This .on("click") function will trigger the AJAX Call to the TicketMaster API
@@ -101,9 +100,17 @@ $(document).ready(function() {
         // Here we grab the city from the input box
         var cityName = $("#event-input").val().trim();
         // Here we grab the start date
-        var searchStart = $("#event-start").val().trim();
+        var userSearchStart = $("#event-start").val().trim();
+        // need to change to the format for the api
+        var apiFormat = "YYYY-MM-DD";
+        var searchStart = moment(userSearchStart, "ll").format(apiFormat);
+        console.log("the search start is " + searchStart);
+
         // Here we grab the end date
-        var searchEnd = $("#event-end").val().trim();
+        var userSearchEnd = $("#event-end").val().trim();
+        // need to change to the format for the api
+        var searchEnd =  moment(userSearchEnd, "ll").format(apiFormat);
+        console.log("the search end is " + searchEnd);
 
         // hardcode the time to midnight
         var timeFormat = "T00:00:00Z";
@@ -128,37 +135,26 @@ $(document).ready(function() {
 
             // get the name of the event
             var eventName = response._embedded.events[i].name;
-            // var pName = $("<p>").text(eventName);
-            // $("#event-view").append(pName);
 
             // get the date and time of the event
             var eventDate = response._embedded.events[i].dates.start.localDate;
-            // var pDate = $("<p>").text(eventDate);
-            // $("#event-view").append(pDate);
-
             var eventTime = response._embedded.events[i].dates.start.localTime;
-            // var pTime = $("<p>").text(eventTime);
-            // $("#event-view").append(pTime);
 
-            // Get a nicer view of the date
-            var dateFormat = "yyyy-mm-dd";
-            var prettyDate = moment(eventDate, dateFormat).format('MMMM Do YYYY');
-            console.log("The date is " +  eventDate    );
-            console.log("The pretty date is " + prettyDate);
+            // Get a nicer format for the date and time
+            var dateFormat = "YYYY-MM-DD";
+            // var prettyDate = moment(eventDate, dateFormat, true).format('MMMM Do YYYY');
+            var prettyDate = moment(eventDate, dateFormat, true).format('ll');
+
+            console.log("The date is [" +  eventDate + "]"   );
+            console.log("The pretty date is [" + prettyDate + "]");
             var timeFormat = "hh:mm:ss";
             var prettyTime = moment(eventTime, timeFormat).format('h:mm a');
 
             // the venue of the event
             var venueName = response._embedded.events[i]._embedded.venues[0].name;
-            // var pVenue = $("<p>").text(venueName);
-            // $("#event-view").append(pVenue);
 
             // get the url of the event
             var eventURL = response._embedded.events[i].url;
-            // var aEvent = $("<a>").text(eventURL);
-            // aEvent.attr("href", eventURL);
-            // aEvent.attr("target", "_blank")
-            // $("#event-view").append(aEvent);
 
             // get the url of the image
             // we need to find the image with the 4-3 ratio
@@ -167,7 +163,6 @@ $(document).ready(function() {
             var conditionNotMet = true;
             var j = 0;
             var imagesLength = response._embedded.events[i].images.length;
-//               for (var j= 0; j < imagesLength; j++)
             // cycle through all the images for this event until you find the image with a 4-3 ratio
             while (conditionNotMet)
             {
@@ -185,30 +180,12 @@ $(document).ready(function() {
             }
 
             // Now build the carousel
-  //           <a class="carousel-item" href="#one!">      
-  //   <div class="card">
-  //     <div class="card-image">
-  //       <img src="https://lorempixel.com/250/250/nature/2">
-  //       <span class="card-title">Card Title</span>
-  //     </div>
-  //     <div class="card-content">
-  //         <p> Lincoln Financial Field </p> <p>10-31-2019 7:00</p>
-  //         <button class="btn-small waves-effect waves-light blue lighten-2" type="submit" name="action"><i class="material-icons right">add</i>Add to cal</button>
-  //       <button class="btn-small waves-effect waves-light blue lighten-2" type="submit" name="action">More Info</button>                        
-  //     </div>
-  //   </div>
-  // </a>
-
-
-            // Now place the image in the carousel
 
             // build the <a class="carousel-item" href="#one!">
-            //HLS note you could hook this up to the url using href
             var aImage = $("<a>");
             aImage.attr("class", "carousel-item");
             aImage.attr("href", eventURL);
             aImage.attr("target", "_blank");
-            // aImage.attr("href", "#one");
             $("#image-view").append(aImage);
             // build the <div class="card">
             var cDiv = $("<div>");
@@ -239,12 +216,12 @@ $(document).ready(function() {
             pDate.text(prettyDate + ",  " + prettyTime);
             ccDiv.append(pVenue, pDate);
 
-            //<button class="btn-small waves-effect waves-light blue lighten-2" type="submit" name="action"><i class="material-icons right">add</i>Add to cal</button>
+            // build the <button class="btn-small waves-effect waves-light blue lighten-2" type="submit" name="action"><i class="material-icons right">add</i>Add to cal</button>
             var addButton = $("<button>");
-            addButton.addClass("btn-small waves-effect waves-light blue lighten-2");
+            addButton.addClass("btn-small waves-effect waves-light blue lighten-2 card-button");
             addButton.attr("type", "submit");
             addButton.attr("name", "action");
-            addButton.attr("id", "addToCal");
+            addButton.attr("id", "addToCal");            
 
             // add meta data to the button
             addButton.attr("data-name", eventName);
@@ -255,36 +232,21 @@ $(document).ready(function() {
 
             var imageSpan = $("<i>");
             imageSpan.addClass("material-icons right");
+            imageSpan.attr("id", "iCard");
             imageSpan.text("add");
             addButton.append(imageSpan);
 
-            //<button class="btn-small waves-effect waves-light blue lighten-2" type="submit" name="action">More Info</button>                        
+            // build the <button class="btn-small waves-effect waves-light blue lighten-2" type="submit" name="action">More Info</button>                        
             var addButton = $("<button>");
-            addButton.addClass("btn-small waves-effect waves-light blue lighten-2");
+            addButton.addClass("btn-small waves-effect waves-light blue lighten-2 card-button");
             addButton.attr("type", "submit");
             addButton.attr("name", "action");
             addButton.text("MORE INFO")
             ccDiv.append(addButton);
 
-
-
-
-            // aImage.append(hImage);
-            // $("#image-view").append(aImage);
-
-            // var hImage = $("<img>");
-            // hImage.attr("src", eventImage);
-            // $("#event-view").append(hImage);
           } //end of for loop
           // Now that carousel is populated call this function to display
           $('.carousel').carousel();
-
-        //   // append the full json reponse
-        //   var pJSON = $("<p>");
-        //   pJSON.text(JSON.stringify(response));
-        // //   $("#event-view").text(JSON.stringify(response));
-        // $("#event-view").append(pJSON);
-
 
         });// end of AJAX then call
     
@@ -292,12 +254,13 @@ $(document).ready(function() {
       
       // HLS want to display the caurousel that I am testing with, this is temporary
       $('.carousel').carousel();
+      $('.datepicker').datepicker();
 
         $(document).on("click.", "#addToCal", function(event){
-            // date in unix
-            //write to database
+
             event.preventDefault();
 
+            // get the meta data from the button's attributes
             var thisName = $(this).attr("data-name");
             var thisURL = $(this).attr("data-url");
             var thisDate = $(this).attr("data-date");
@@ -306,14 +269,12 @@ $(document).ready(function() {
             console.log( "the url is " + thisURL);
             console.log( "the date is " + thisDate);
 
-            //upload input text to database
+            //upload event data to database
             database.ref().push({
                 event: thisName,
                 detail: thisURL,
                 date: thisDate
             });
-
-
         
         });
 

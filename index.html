@@ -95,21 +95,36 @@
         <div class="row">
             <div class="col s12 eventsAPI">
                 <div class="container">
-                    <h1>Event Search</h1>
-                
+                    <h5>Event Search</h5>
+                                    
                     <!-- This form is where users input data about the events -->
                     <form id="event-form">
-                      <label for="event-input">Search for events for this city</label>
-                      <input type="text" id="event-input" value="Trenton"><br>
-                
-                      <label for="event-start">Search for this start date ("yyyy-mm-dd")</label>
-                      <input type="text" id="event-start"  value="2019-03-08"><br>
-                
-                      <label for="event-end">Search for this end date ("yyyy-mm-dd")</label>
-                      <input type="text" id="event-end" value="2019-04-30"><br>
-                
-                      <!-- This button will trigger our AJAX call -->
-                      <input id="find-event" type="submit" value="Event Search">
+                      <div class="row">
+                        <div class="col s12 ">
+                            <label for="event-input">Search for events for this city</label>
+                            <input type="text" id="event-input" value="Trenton">
+                        </div> <!-- end of column-->
+                      </div> <!--end of row-->
+
+                      <div class="row">
+                        <div class="col s6 ">
+                            <label for="event-start">Search for this start date </label>
+                            <input type="text" class="datepicker" id="event-start" value="Mar 10, 2019">   
+                        </div> <!-- end of column-->
+                        <div class="col s6 ">
+                            <label for="event-end">Search for this end date </label>
+                            <input type="text" class="datepicker" id="event-end" value="Apr 30, 2019">   
+                        </div> <!-- end of column-->
+                    </div> <!-- end of row -->
+
+                    <div class="row">
+                        <div class="col s12 ">
+                            <!-- This button will trigger our AJAX call -->
+                            <a class="waves-effect waves-light btn" id="find-event"><i class="material-icons left">search</i>SEARCH</a>
+                            <!-- <input id="find-event" type="submit" value="Event Search"> -->
+                        </div> <!-- end of column-->
+                    </div> <!-- end of row -->
+
                     </form>
                   
                     <!-- We'll be dumping our JSON contents in here -->
@@ -117,6 +132,7 @@
                 
                     <!-- We create a carousel of images here-->
                     <div class="carousel" id="image-view">
+                      <!-- HLS this carousel-item is a proof of concept this is temporary-->
                       <a class="carousel-item" href="#one!">
                         <div class="card">
                           <div class="card-image">
