@@ -2,17 +2,16 @@
 * {
     box-sizing: border-box;
 }
+.mainWidth {
+    width: 960px;
+}
 
 .calendarBody {
-    border: 1px solid #888; height: 600px;
+    border: 1px solid #888; height: 900px;
 }
 
 .inputColumn {
-    border: 1px solid #888; height: 600px;
-}
-
-.eventsAPI {
-    border: 1px solid #888; 
+    border: 1px solid #888; height: 900px;
 }
 
 /* for the carousel */

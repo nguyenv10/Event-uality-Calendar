@@ -129,43 +129,56 @@ function showCalendar(month, year) {
 
     // creating all cells
     let date = 1;
+    //weeks created
     for (let i = 0; i < 6; i++) {
         // creates a table row
         let row = document.createElement("tr");
 
+        //each day created in the week
         //creating individual cells, filing them up with data.
         for (let j = 0; j < 7; j++) {
 
-
-
+            //for the days before day 1 of the month
             if (i === 0 && j < firstDay) {
+
                 let cell = document.createElement("td");
                 let cellText = document.createTextNode("");
+                
+    
                 cell.appendChild(cellText);
                 row.appendChild(cell);
             }
+
             else if (date > daysInMonth) {
                 break;
             }
 
+            //days starting with day 1 of month
             else {
-
-
 
                 let img = document.createElement("IMG");
 
-                img.setAttribute("src","../images/"+weather_json.list[my_counter].weather[0].icon+".png");
+                img.setAttribute("src","assets/images/"+weather_json.list[my_counter].weather[0].icon+".png");
                 img.setAttribute("width","20");
                 img.setAttribute("height","20");
 
-
                 let cell = document.createElement("td");
                 let cellText;
+              
+                
+              // add ID tag to each day of format 2019-03-22
+                var attrID = selectYear.value + "-" + (parseInt(selectMonth.value) + 1) + "-" + date;     //2019-03-22
+                var newDate = moment(attrID, "YYYY-MM-DD").format("YYYY-MM-DD");
+                
+                console.log(newDate);
+                cell.setAttribute("id", newDate);
 
+                
                 if (date === today.getDate() && year === today.getFullYear() && month === today.getMonth())
                 {
                     cell.appendChild(img);
                     cellText = document.createTextNode(date+" "+weather_json.list[my_counter].weather[0].main);
+
                     my_counter++;
                     add_weather_data=true;
                 }
@@ -178,7 +191,7 @@ function showCalendar(month, year) {
                         if(weather_conditions[my_counter])
                         {
 
-                            img.setAttribute("src","../images/"+weather_icons[my_counter]+".png");
+                            img.setAttribute("src","assets/images/"+weather_icons[my_counter]+".png");
                             img.setAttribute("width","20");
                             img.setAttribute("height","20");
                             cell.appendChild(img);
