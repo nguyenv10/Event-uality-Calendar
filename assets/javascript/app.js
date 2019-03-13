@@ -433,7 +433,8 @@ function get_data_from_json()
                 if (j===imagesLength) {
                   // you've cycled through all the images and didn't find what you need
                   // set the image to a default url
-                  eventImage = "https://lorempixel.com/250/250/nature/1";
+                //   eventImage = "https://lorempixel.com/250/250/nature/1";
+                  eventImage = "assets/images/the-road-815297_640.jpg";
                 }
             }
 
