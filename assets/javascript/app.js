@@ -131,7 +131,7 @@ firebase.auth().onAuthStateChanged(firebaseUser => {
 
 /********************* CALENDAR CODE *****************************/
 
-var url = 'http://api.openweathermap.org/data/2.5/forecast?q=philadelphia,us&appid=7e821b3220bf8808a333170a6ef0bce4';
+var url = 'https://api.openweathermap.org/data/2.5/forecast?q=philadelphia,us&appid=7e821b3220bf8808a333170a6ef0bce4';
 var firebase_ref = firebase.database().ref();
 $.getJSON(url,prepareCalendarData);
 //Will store all the icon provided by API.
