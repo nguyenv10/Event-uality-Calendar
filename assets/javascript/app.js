@@ -393,8 +393,24 @@ function get_data_from_json() {
         // Here, it prevents the submit button from trying to submit a form when clicked
         event.preventDefault();
 
-        // Here we grab the city from the input box
+        // Empty any past searches
+        $("#image-view").empty();
+        // Empty any past error messages
+        $("#errorMsg").empty();
+
+
         var cityName = $("#event-input").val().trim();
+        // Here we validate the city from the input box
+        if (( cityName === "") || ( cityName === undefined)){
+            $("#errorMsg").text("Please enter a city.")
+            return false;
+          } // check the city is not numeric
+           else if ( $.isNumeric( cityName ) ){
+            $("#errorMsg").text("Please enter a valid city.")
+            return false;
+          }
+        
+
         // Here we grab the start date
         var userSearchStart = $("#event-start").val().trim();
         // need to change to the format for the api
@@ -423,6 +439,12 @@ function get_data_from_json() {
           method: "GET"
         }).then(function(response) {
 
+          // Need to check for a valid response here
+          if (response.page.totalElements === 0)
+          {
+            $("#errorMsg").text("This search did not find any results.")
+            return false;
+          }
 
           // Cycle throgh all the events that are returned from the query
           var numEvents = response._embedded.events.length;
@@ -550,8 +572,18 @@ function get_data_from_json() {
       }); //end of on click call
       
       // HLS want to display the caurousel that I am testing with, this is temporary
-      $('.carousel').carousel();
+      //   $('.carousel').carousel();
+
       $('.datepicker').datepicker();
+        // val dpicker = $('.datepicker');
+        // dpicker.datepicker();
+        // this.instanceDatepicker = new M.Datepicker(this.elDatepicker.nativeElement, {
+        //     defaultDate: new Date(),
+        //     setDefaultDate: true,
+        //     selectMonths: true,
+        //     selectYears: 200, 
+        //     format: "dd/mm/yyyy"
+        // });
 
         $(document).on("click.", "#addToCal", function(event){
 
