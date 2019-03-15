@@ -15,272 +15,303 @@ $(document).ready(function() {
     
 
 
+
+
+/************* modal alerts *********************/
+// Get the modal
+var modal = document.getElementById('myModal');
+
+// Get the <span> element that closes the modal
+var span = document.getElementsByClassName("close")[0];
+
+// When the user clicks on <span> (x), close the modal
+span.onclick = function() {
+  modal.style.display = "none";
+}
+
+// When the user clicks anywhere outside of the modal, close it
+window.onclick = function(event) {
+  if (event.target == modal) {
+    modal.style.display = "none";
+  }
+}
+
+/*********NAV BAR **************************************/
+var txtEmail = document.getElementById("txtEmail");
+var txtPassword = document.getElementById("txtPassword");
+var btnLogin = document.getElementById("btnLogin");
+var btnSignUp = document.getElementById("btnSignUp");
+var btnLogout = document.getElementById("btnLogout");
+var loginName = document.getElementById("loginName");
+
+//grab current user's ID 
+var userId = "Anon";
+
+function reloadpage() {
+    window.location.reload()
+}
+
+//Add login event
+btnLogin.addEventListener("click", e => {
+
+    //Get email and password
+    var email = txtEmail.value;
+    var pass = txtPassword.value;
+    var auth = firebase.auth();
+
+    //Sign in
+    var promise = auth.signInWithEmailAndPassword(email, pass);
+    //promise.catch(e => alert(e.message));
+    promise.catch(e => modal.style.display = "block");
+});
+
+//Add signup
+btnSignUp.addEventListener("click", e => {
+
+    //Get email and password
+    // TODO: check for real email
+    var email = txtEmail.value;
+    var pass = txtPassword.value;
+    var auth = firebase.auth();
+
+    //Sign in
+    var promise = auth.createUserWithEmailAndPassword(email, pass);
+    //promise.catch(e => alert(e.message));
+    promise.catch(e => modal.style.display = "block");
+})
+
+//event listener for logout
+btnLogout.addEventListener("click", e => {
+    firebase.auth().signOut();
+});
+
+//realtime listener as authentication changes. show or hide buttons 
+firebase.auth().onAuthStateChanged(firebaseUser => {
+    if(firebaseUser) {
+        console.log(firebaseUser);
+        btnLogout.classList.remove("d-none");
+        loginName.classList.remove("d-none");
+        btnLogin.classList.add("d-none");
+        btnSignUp.classList.add("d-none");
+        txtEmail.classList.add("d-none");
+        txtPassword.classList.add("d-none");
+        document.getElementById("loginName").innerHTML = firebaseUser.email;
+        userId = firebaseUser.uid;
+        console.log(userId);
+    } else {
+        console.log("not logged in");
+        btnLogout.classList.add("d-none");
+        loginName.classList.add("d-none");
+        btnLogin.classList.remove("d-none");
+        btnSignUp.classList.remove("d-none");
+        txtEmail.classList.remove("d-none");
+        txtPassword.classList.remove("d-none");   
+    }
+});
+
+
+
+
+
+
+
 /********************* CALENDAR CODE *****************************/
-
-
-
-
 
 var url = 'http://api.openweathermap.org/data/2.5/forecast?q=philadelphia,us&appid=7e821b3220bf8808a333170a6ef0bce4';
 var firebase_ref = firebase.database().ref();
-
-$.getJSON(url,put_data_to_calendar);
-
+$.getJSON(url,prepareCalendarData);
+//Will store all the icon provided by API.
 var weather_icons = new Array();
 var weather_conditions = new Array();
+//Will store all the date which have weather report.
 var weather_dates = new Array();
-
+//Will store the json info sent by API.
 var weather_json;
-var my_counter=0;
-
-var add_weather_data = false;
-
-
-
-
-function put_data_to_calendar(data)
-{
-    weather_json = data;
-    var cur_date = data.list[0].dt_txt;
-    var cur_date_array = cur_date.split(" ");
-    cur_day_my = cur_date_array[0].split("-");
-    weather_condition = data.list[0].weather[0].main;
-    weather_icon = data.list[0].weather[0].icon;
-
-
-
-
-
-    firebase_ref.on('value', snap=>{
-
-
-        snap.forEach(function(childSnapshot){
-
-
-            var key = childSnapshot.key;
-
-            var childData = childSnapshot.val();
-
-
-
-            $(".schedules").append("DATE = "+childData["date"]+" ");
-            $(".schedules").append("EVENT = "+childData["event"]);
-
-            $(".schedules").append("<br>");
-        });
-
-
-
-
-    });
-
-
-    get_data_from_json();
-    showCalendar(currentMonth, currentYear);
-}
-
-
+var my_counter = 0;
+//Will store all the event stored in the database.
+var events = new Array();
 let today = new Date();
 let currentMonth = today.getMonth();
 let currentYear = today.getFullYear();
-let selectYear = document.getElementById("year");
-let selectMonth = document.getElementById("month");
+let months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+//Will put the calender title month year - i.e Mar 2019
+let title = document.getElementById("title");
 
+var add_weather_data = false;
+/*
+ * This function will reset all the necessary variable
+ */
+function resetVariable(){
+    my_counter = 0;
+    add_weather_data = false;
+    weather_dates.length = 0;
+    weather_conditions.length = 0;
+    weather_icons.length = 0;
+    events.length = 0;
+    get_data_from_json();
+}
+/*
+ * This function will trigger after data provided by API
+ * It will also fetch all the events and listed in an array
+ * */
+function prepareCalendarData(data){
+    weather_json = data;
+    get_data_from_json();
+    showCalendar(currentMonth, currentYear);
+   
+    resetVariable();
+    get_data_from_json();
+    showCalendar(currentMonth, currentYear);
+}
+/*
+* This function will trigger is clicked on next button
+* */
 
-
-let months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-
-let monthAndYear = document.getElementById("monthAndYear");
-
-
-
-function next() {
+$("#next").on("click", function() {
     currentYear = (currentMonth === 11) ? currentYear + 1 : currentYear;
     currentMonth = (currentMonth + 1) % 12;
+    resetVariable();
     showCalendar(currentMonth, currentYear);
-}
-
-function previous() {
+});
+/*
+ * This function will trigger is clicked on previous button
+ * */
+$("#previous").on("click", function() {
     currentYear = (currentMonth === 0) ? currentYear - 1 : currentYear;
     currentMonth = (currentMonth === 0) ? 11 : currentMonth - 1;
+    resetVariable();
     showCalendar(currentMonth, currentYear);
+});
+/*
+ * This function prepare date using the provided year month and date
+ * */
+function getToday(year, month, day){
+    let Y = year, M = month+1, D = day;
+    if(M < 10) {
+        M = '0'+M;
+    }
+    if(D < 10) {
+        D = '0'+D;
+    }
+    return Y+'-'+M+'-'+D;
 }
-
-function jump() {
-    currentYear = parseInt(selectYear.value);
-    currentMonth = parseInt(selectMonth.value);
-    showCalendar(currentMonth, currentYear);
-}
-
+/*
+* This function will generate the calendar
+* */
 function showCalendar(month, year) {
-
     let firstDay = (new Date(year, month)).getDay();
     let daysInMonth = 32 - new Date(year, month, 32).getDate();
-
     let tbl = document.getElementById("calendar-body"); // body of the calendar
-
     // clearing all previous cells
     tbl.innerHTML = "";
-
-    // filing data about month and in the page via DOM.
-    monthAndYear.innerHTML = months[month] + " " + year;
-    selectYear.value = year;
-    selectMonth.value = month;
-
+    // filing data about month and Year in the page via DOM.
+    title.innerHTML = months[month] +"<br><span style='font-size:18px'>"+year+"</span>";
     // creating all cells
     let date = 1;
-    //weeks created
     for (let i = 0; i < 6; i++) {
         // creates a table row
         let row = document.createElement("tr");
-
-        //each day created in the week
         //creating individual cells, filing them up with data.
         for (let j = 0; j < 7; j++) {
-
-            //for the days before day 1 of the month
+            let dateToday = getToday(year, month, date);
             if (i === 0 && j < firstDay) {
-
+                //if this day is not for this month
                 let cell = document.createElement("td");
                 let cellText = document.createTextNode("");
-                
-    
                 cell.appendChild(cellText);
                 row.appendChild(cell);
             }
-
             else if (date > daysInMonth) {
+                //if the day is greater than this month
                 break;
             }
-
-            //days starting with day 1 of month
             else {
-
+                //if this day is within this month
                 let img = document.createElement("IMG");
-
                 img.setAttribute("src","assets/images/"+weather_json.list[my_counter].weather[0].icon+".png");
-                img.setAttribute("width","20");
-                img.setAttribute("height","20");
-
+                img.setAttribute("width","50");
+                img.setAttribute("height","50");
                 let cell = document.createElement("td");
+                let EventT = document.createElement("p");
                 let cellText;
-              
-                
-              // add ID tag to each day of format 2019-03-22
-                var attrID = selectYear.value + "-" + (parseInt(selectMonth.value) + 1) + "-" + date;     //2019-03-22
-                var newDate = moment(attrID, "YYYY-MM-DD").format("YYYY-MM-DD");
-                
-                console.log(newDate);
-                cell.setAttribute("id", newDate);
 
-                
+                // add ID tag to each day of format 2019-03-22
+                // We have to add 1 to the month because selectMonth is [0-11]
+               var attrID = year + "-" + (parseInt(month) + 1) + "-" + date;     //2019-03-22
+               var newDate = moment(attrID, "YYYY-MM-DD").format("YYYY-MM-DD");
+
+               console.log(newDate);
+               cell.setAttribute("id", newDate);
+           
+
+
+                if(events[dateToday]){
+                    EventT.innerHTML = "<br><span class='glyphicon glyphicon-calendar'></span>"+events[dateToday];
+                    cell.classList.add("bg-event");
+                }
                 if (date === today.getDate() && year === today.getFullYear() && month === today.getMonth())
                 {
+                    //if this day is today
                     cell.appendChild(img);
                     cellText = document.createTextNode(date+" "+weather_json.list[my_counter].weather[0].main);
-
                     my_counter++;
                     add_weather_data=true;
+                    cell.classList.add("bg-info");
                 }
                 else
                 {
-
-
                     if(add_weather_data)
                     {
                         if(weather_conditions[my_counter])
                         {
-
                             img.setAttribute("src","assets/images/"+weather_icons[my_counter]+".png");
                             img.setAttribute("width","20");
                             img.setAttribute("height","20");
                             cell.appendChild(img);
-
                             cellText = document.createTextNode(date+" "+weather_conditions[my_counter]);
                         }
                         else
                         {
                             cellText = document.createTextNode(date);
                         }
-
-
                         my_counter++;
                     }
                     else
                     {
-
-
-
                         cellText = document.createTextNode(date);
                     }
-
-
-
-
-
                 }
-
-
-
-
-                if (date === today.getDate() && year === today.getFullYear() && month === today.getMonth())
-                {
-                    cell.classList.add("bg-info");
-
-                } // color today's date
-
                 cell.appendChild(cellText);
+                cell.appendChild(EventT);
                 row.appendChild(cell);
-
                 date++;
-
             }
-
-
         }
-
         tbl.appendChild(row); // appending each row into calendar body.
     }
-
 }
-
-
-function get_data_from_json()
-{
+/*
+* This function will prepare the data sent by the weather API
+* */
+function get_data_from_json() {
+    //Loop through the list of data
     for(var r =0;r<weather_json.list.length;r++)
     {
+        //Date in string
         var temp = weather_json.list[r].dt_txt;
         var date_array = temp.split(" ");
         var day = date_array[0].split("-");
-
-
+        //if the day not listed
         if(day[2] != weather_dates[weather_dates.length-1])
         {
-
             var temp_condition = weather_json.list[r].weather[0].main;
             var temp_icon = weather_json.list[r].weather[0].icon;
-
             weather_dates.push(day[2]);
-
             weather_conditions.push(temp_condition);
-
             weather_icons.push(temp_icon);
-
         }
-
     }
-
-
 }
-
-
-
-
-
-
-
-
-
 
 
 
@@ -307,6 +338,7 @@ function get_data_from_json()
     
             //upload input text to database
             database.ref().push({
+                userId: userId,
                 event: inputEvent,
                 detail: inputDetails,
                 date: inputDate
@@ -324,20 +356,26 @@ function get_data_from_json()
     //display the data pushed to firebase to calendar
     database.ref().on("child_added", function(childSnapshot) {
     
+        var userData = childSnapshot.val();
+        /**
         //grab details
         var eventInputText = childSnapshot.val().event;
         var detailsInputText = childSnapshot.val().detail;
         var dateInputText = childSnapshot.val().date;
-    
-        //create new span variable
-        var newList = $("<li>");
-    
-            newList.addClass("event-title");
-            newList.append("<strong>" + eventInputText + "</strong><br>");
-            newList.attr("title", detailsInputText);
-    
-        $("#" + dateInputText).append(newList);
-    
+        **/
+
+        if (userData.userId === userId) {
+            //create new span variable
+            var newList = $("<li>");
+        
+                newList.addClass("event-title");
+                newList.append("<strong>" + userData.event + "</strong><br>");
+                newList.attr("title", userData.detail);
+        
+            $("#" + userData.date).append(newList).addClass("bg-event");
+        } else {
+            return false;
+        }
     });
     
     
@@ -519,6 +557,7 @@ function get_data_from_json()
 
             event.preventDefault();
 
+       
             // get the meta data from the button's attributes
             var thisName = $(this).attr("data-name");
             var thisURL = $(this).attr("data-url");
@@ -530,6 +569,7 @@ function get_data_from_json()
 
             //upload event data to database
             database.ref().push({
+                userId: userId,
                 event: thisName,
                 detail: thisURL,
                 date: thisDate
@@ -542,8 +582,8 @@ function get_data_from_json()
 
 
 
-
-
+//for jump to selecting a month and year
+$('select').formSelect();
 
 
 
@@ -551,4 +591,3 @@ function get_data_from_json()
 
 //end of document ready
 });
-    
