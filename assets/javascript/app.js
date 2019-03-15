@@ -36,6 +36,8 @@ window.onclick = function(event) {
   }
 }
 
+
+
 /*********NAV BAR **************************************/
 var txtEmail = document.getElementById("txtEmail");
 var txtPassword = document.getElementById("txtPassword");
@@ -62,7 +64,11 @@ btnLogin.addEventListener("click", e => {
     //Sign in
     var promise = auth.signInWithEmailAndPassword(email, pass);
     //promise.catch(e => alert(e.message));
-    promise.catch(e => modal.style.display = "block");
+    //promise.catch(e => modal.style.display = "block");
+
+    setTimeout(function() {
+        location.reload();
+    }, 500);
 });
 
 //Add signup
@@ -77,12 +83,20 @@ btnSignUp.addEventListener("click", e => {
     //Sign in
     var promise = auth.createUserWithEmailAndPassword(email, pass);
     //promise.catch(e => alert(e.message));
-    promise.catch(e => modal.style.display = "block");
+    //promise.catch(e => modal.style.display = "block");
+
+    setTimeout(function() {
+        location.reload();
+    }, 500);
 })
 
 //event listener for logout
 btnLogout.addEventListener("click", e => {
     firebase.auth().signOut();
+
+    setTimeout(function() {
+        location.reload();
+    }, 500);
 });
 
 //realtime listener as authentication changes. show or hide buttons 
@@ -240,7 +254,7 @@ function showCalendar(month, year) {
                var attrID = year + "-" + (parseInt(month) + 1) + "-" + date;     //2019-03-22
                var newDate = moment(attrID, "YYYY-MM-DD").format("YYYY-MM-DD");
 
-               console.log(newDate);
+    
                cell.setAttribute("id", newDate);
            
 
